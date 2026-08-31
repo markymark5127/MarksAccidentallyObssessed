@@ -4,6 +4,10 @@ Official site for the YouTube channel [Mark's Accidentally Obsessed](https://www
 
 Rabbit holes. Hobbies. Hyperfixations.
 
+- YouTube: https://www.youtube.com/@MarkAccidentallyObsessed
+- TikTok: https://www.tiktok.com/@marksobsessed
+- Amazon Associates tag: `markcurrently-20`
+
 ## Pages
 
 - `index.html` — home, latest videos, about
@@ -19,9 +23,13 @@ Repo **Settings → Pages → Build and deployment**
 - Source: **Deploy from a branch**
 - Branch: `main` / `/ (root)`
 
-The live URL will be:
+After that the live URL should be:
 
 https://markymark5127.github.io/MarksAccidentallyObssessed/
+
+If a custom domain is set on the user site, it may appear as:
+
+https://www.markmaynejr.com/MarksAccidentallyObssessed/
 
 ## Local preview
 
