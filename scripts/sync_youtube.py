@@ -25,10 +25,37 @@ def fetch_long_form():
         "socket_timeout": 25,
         "retries": 2,
     }
-    with YoutubeDL(settings) as ydl:
-        response = ydl.extract_info(CHANNEL, download=False)
-    if not response or not response.get("entries"):
-        raise RuntimeError("YouTube returned no channel video entries; leaving site unchanged")
+    # Resolve the actual channel ID from a previously linked public video if
+    # the vanity handle is inaccessible to YouTube's tab extractor.
+    sources = [CHANNEL]
+    try:
+        with YoutubeDL({**settings, "extract_flat": False}) as ydl:
+            seed = ydl.extract_info(
+                "https://www.youtube.com/watch?v=1AK5A76XsS8", download=False
+            )
+        channel_id = seed.get("channel_id") if seed else None
+        if channel_id and channel_id.startswith("UC"):
+            sources.append(f"https://www.youtube.com/channel/{channel_id}/videos")
+            sources.append(f"https://www.youtube.com/playlist?list=UU{channel_id[2:]}")
+            print(f"Resolved channel ID: {channel_id}")
+        else:
+            print("Prior public video did not return a channel ID")
+    except Exception as exc:
+        print(f"Could not resolve channel from prior upload: {exc}")
+
+    response = None
+    for source in sources:
+        try:
+            with YoutubeDL(settings) as ydl:
+                candidate = ydl.extract_info(source, download=False)
+            if candidate and candidate.get("entries"):
+                response = candidate
+                print(f"Loaded video listing from {source}")
+                break
+        except Exception as exc:
+            print(f"Video listing failed for {source}: {exc}")
+    if not response:
+        raise RuntimeError("YouTube refused the channel listing; leaving existing pages unchanged")
 
     results = []
     for item in response["entries"]:
